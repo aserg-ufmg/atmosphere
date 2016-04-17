@@ -15,7 +15,7 @@
  */
 package org.atmosphere.cpr;
 
-import org.atmosphere.util.CookieUtil;
+import org.atmosphere.util.tools.CookieUtil;
 import org.atmosphere.util.ServletProxyFactory;
 import org.atmosphere.websocket.WebSocket;
 import org.slf4j.Logger;

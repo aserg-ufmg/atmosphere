@@ -763,9 +763,9 @@ public interface ApplicationConfig {
      * This is required with when JSR356 is used and JAXRS like Jersey2 is used.
      * <p/>
      * Default: true<br>
-     * Value: org.atmosphere.websocket.protocol.SimpleHttpProtocol.rewriteURL
+     * Value: org.atmosphere.websocket.protocol.ProtocolSimpleHttp.rewriteURL
      */
-    String REWRITE_WEBSOCKET_REQUESTURI = "org.atmosphere.websocket.protocol.SimpleHttpProtocol.rewriteURL";
+    String REWRITE_WEBSOCKET_REQUESTURI = "org.atmosphere.websocket.protocol.ProtocolSimpleHttp.rewriteURL";
     /**
      * The heartbeat padding String.
      * <p/>

@@ -25,7 +25,7 @@ import org.atmosphere.cpr.AtmosphereRequest;
 import org.atmosphere.cpr.AtmosphereResource;
 import org.atmosphere.cpr.AtmosphereResponse;
 import org.atmosphere.cpr.HeaderConfig;
-import org.atmosphere.util.StringEscapeUtils;
+import org.atmosphere.util.tools.StringEscapeUtils;
 import org.atmosphere.util.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,8 +42,6 @@ public class JSONPAtmosphereInterceptor extends AtmosphereInterceptorAdapter {
     private static final Logger logger = LoggerFactory.getLogger(JSONPAtmosphereInterceptor.class);
     private String endChunk = "\"});";
     private String startChunk = "({\"message\" : \"";
-    private AtmosphereConfig config;
-
     @Override
     public void configure(AtmosphereConfig config) {
         this.config = config;

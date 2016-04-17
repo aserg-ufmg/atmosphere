@@ -55,6 +55,8 @@ public abstract class AbstractReflectorAtmosphereHandler implements AtmosphereSe
 
     private boolean twoStepsWrite;
 
+	protected AtmosphereConfig config;
+
     /**
      * Write the {@link AtmosphereResourceEvent#getMessage()} back to the client using
      * the {@link AtmosphereResponseImpl#getOutputStream()} or {@link AtmosphereResponseImpl#getWriter()}.

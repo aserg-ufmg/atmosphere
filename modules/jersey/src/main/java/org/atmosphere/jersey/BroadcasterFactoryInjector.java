@@ -40,7 +40,7 @@ abstract class BroadcasterFactoryInjector extends BaseInjectableProvider {
     protected BroadcasterFactoryInjector() {
     }
 
-    boolean isValidType(Type t) {
+    protected boolean isValidType(Type t) {
         return (t instanceof Class) && BroadcasterFactory.class.isAssignableFrom((Class) t);
     }
 

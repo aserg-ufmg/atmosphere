@@ -33,7 +33,7 @@
  * limitations under the License.
  */
 
-package org.atmosphere.util;
+package org.atmosphere.util.tools;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

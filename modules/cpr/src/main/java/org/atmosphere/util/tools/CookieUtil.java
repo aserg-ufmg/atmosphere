@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.atmosphere.util;
+package org.atmosphere.util.tools;
 
 import javax.servlet.http.Cookie;
 import java.text.DateFormat;

@@ -28,6 +28,7 @@ public final class GrizzlyWebSocket extends WebSocket {
 
     private static final Logger logger = LoggerFactory.getLogger(GrizzlyWebSocket.class);
     private final com.sun.grizzly.websockets.WebSocket webSocket;
+	private Object attachment;
 
     public GrizzlyWebSocket(com.sun.grizzly.websockets.WebSocket webSocket, AtmosphereConfig config) {
         super(config);
@@ -64,4 +65,21 @@ public final class GrizzlyWebSocket extends WebSocket {
         logger.trace("WebSocket.flush() not supported by Grizzly");
         return this;
     }
+
+	/**
+	 * Attach an object. Be careful when attaching an object as it can cause memory leak
+	 *
+	 * @oaram object
+	 */
+	public WebSocket attachment(Object attachment) {
+	    this.attachment = attachment;
+	    return this;
+	}
+
+	/**
+	 * Return the attachment
+	 */
+	public Object attachment() {
+	    return attachment;
+	}
 }

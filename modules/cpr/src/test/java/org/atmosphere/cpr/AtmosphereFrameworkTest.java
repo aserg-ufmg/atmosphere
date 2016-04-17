@@ -194,6 +194,10 @@ public class AtmosphereFrameworkTest {
             framework().setBroadcasterFactory(new MyBroadcasterFactory());
         }
 
+		protected AtmosphereFramework newAtmosphereFramework() {
+		    return initializer.newAtmosphereFramework(AtmosphereFramework.class);
+		}
+
     }
 
     /**

@@ -25,7 +25,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 
 import static org.atmosphere.util.IOUtils.isBodyEmpty;
-import static org.atmosphere.util.IOUtils.readEntirely;
+import static org.atmosphere.util.IOUtils.readEntirelyBody;
 
 /**
  * This read the request's body and invoke the associated {@link org.atmosphere.cpr.Broadcaster} of an {@link AtmosphereResource}.
@@ -49,7 +49,7 @@ public class BroadcastOnPostAtmosphereInterceptor extends AtmosphereInterceptorA
             AtmosphereRequest request = r.getRequest();
             Object o;
             try {
-                o = readEntirely(r);
+                o = readEntirelyBody(r);
             } catch (IOException e) {
                 logger.warn("", e);
                 return;

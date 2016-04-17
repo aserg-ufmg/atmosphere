@@ -57,7 +57,6 @@ public class TrackMessageSizeInterceptor extends AtmosphereInterceptorAdapter {
     private static final Logger logger = LoggerFactory.getLogger(TrackMessageSizeInterceptor.class);
     private final static byte[] END = "|".getBytes();
     private final static String IN_ENCODING = "UTF-8";
-    private final static String OUT_ENCODING = "UTF-8";
     public final static String SKIP_INTERCEPTOR = TrackMessageSizeInterceptor.class.getName() + ".skip";
 
     private byte[] end = END;

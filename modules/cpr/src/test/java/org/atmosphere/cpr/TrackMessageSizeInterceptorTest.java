@@ -135,6 +135,7 @@ public class TrackMessageSizeInterceptorTest {
     public final class ArrayBaseWebSocket extends WebSocket {
 
         private final OutputStream outputStream;
+		private Object attachment;
 
         public ArrayBaseWebSocket(OutputStream outputStream) {
             super(framework.getAtmosphereConfig());
@@ -161,5 +162,22 @@ public class TrackMessageSizeInterceptorTest {
         @Override
         public void close() {
         }
+
+		/**
+		 * Attach an object. Be careful when attaching an object as it can cause memory leak
+		 *
+		 * @oaram object
+		 */
+		public WebSocket attachment(Object attachment) {
+		    this.attachment = attachment;
+		    return this;
+		}
+
+		/**
+		 * Return the attachment
+		 */
+		public Object attachment() {
+		    return attachment;
+		}
     }
 }

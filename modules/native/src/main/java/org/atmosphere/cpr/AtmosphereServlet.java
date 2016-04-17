@@ -86,12 +86,8 @@ public class AtmosphereServlet extends HttpServlet implements CometProcessor, Ht
     }
 
     protected AtmosphereServlet configureFramework(ServletConfig sc) throws ServletException {
-        return configureFramework(sc, true);
-    }
-
-    protected AtmosphereServlet configureFramework(ServletConfig sc, boolean init) throws ServletException {
-        initializer.configureFramework(sc, init, true, AtmosphereFramework.class);
-        return this;
+        initializer.configureFramework(sc, true, true, AtmosphereFramework.class);
+		return this;
     }
 
     protected AtmosphereFramework newAtmosphereFramework() {

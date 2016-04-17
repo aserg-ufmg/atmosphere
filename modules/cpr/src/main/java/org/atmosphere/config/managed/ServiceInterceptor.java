@@ -33,8 +33,6 @@ import javax.inject.Named;
 public abstract class ServiceInterceptor extends AtmosphereInterceptorAdapter {
     private final Logger logger = LoggerFactory.getLogger(ServiceInterceptor.class);
 
-    protected AtmosphereConfig config;
-
     public ServiceInterceptor() {
     }
 
@@ -81,7 +79,7 @@ public abstract class ServiceInterceptor extends AtmosphereInterceptorAdapter {
         String pathInfo = null;
         boolean reMap = false;
 
-        path = Utils.pathInfo(request);
+        path = Utils.getPathInfo(request);
 
         // Remove the Broadcaster with curly braces
         if (b.getID().contains("{")) {

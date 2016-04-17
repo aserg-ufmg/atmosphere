@@ -157,7 +157,12 @@ public class UUIDBroadcasterCache implements BroadcasterCache {
         }
 
         CacheMessage cacheMessage = new CacheMessage(messageId, message.message(), uuid);;
-        if (cache) {
+        configureCacheMessage(broadcasterId, uuid, cache, cacheMessage);
+        return cacheMessage;
+    }
+
+	private void configureCacheMessage(String broadcasterId, String uuid, boolean cache, CacheMessage cacheMessage) {
+		if (cache) {
             if (uuid.equals(NULL)) {
                 //no clients are connected right now, caching message for all active clients
                 for (Map.Entry<String, Long> entry : activeClients.entrySet()) {
@@ -168,8 +173,7 @@ public class UUIDBroadcasterCache implements BroadcasterCache {
                 addMessageIfNotExists(broadcasterId, uuid, cacheMessage);
             }
         }
-        return cacheMessage;
-    }
+	}
 
     @Override
     public List<Object> retrieveFromCache(String broadcasterId, String uuid) {

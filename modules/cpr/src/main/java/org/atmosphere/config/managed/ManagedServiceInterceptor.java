@@ -50,13 +50,7 @@ public class ManagedServiceInterceptor extends ServiceInterceptor {
                         String targetPath = a.path();
                         if (targetPath.indexOf("{") != -1 && targetPath.indexOf("}") != -1) {
                             try {
-                                boolean singleton = ap.target().getClass().getAnnotation(Singleton.class) != null;
-                                if (!singleton) {
-                                    ap = proxyHandler();
-
-                                    final Object o = config.framework().newClassInstance(Object.class, AnnotatedProxy.class.cast(w.atmosphereHandler).target().getClass());
-                                    ap.configure(config, o);
-                                }
+                                ap = configureAnnotatedProxyIfSingleton(w, ap);
 
                                 request.localAttributes().put(Named.class.getName(), path.substring(targetPath.indexOf("{")));
                                 if (ap.pathParams()) {
@@ -79,6 +73,19 @@ public class ManagedServiceInterceptor extends ServiceInterceptor {
             }
         }
     }
+
+	private AnnotatedProxy configureAnnotatedProxyIfSingleton(
+			AtmosphereFramework.AtmosphereHandlerWrapper handlerWrapper, AnnotatedProxy annotatedProxy)
+			throws IllegalAccessException, InstantiationException {
+		boolean singleton = annotatedProxy.target().getClass().getAnnotation(Singleton.class) != null;
+		if (!singleton) {
+		    annotatedProxy = proxyHandler();
+
+		    final Object o = config.framework().newClassInstance(Object.class, AnnotatedProxy.class.cast(handlerWrapper.atmosphereHandler).target().getClass());
+		    annotatedProxy.configure(config, o);
+		}
+		return annotatedProxy;
+	}
 
     protected AnnotatedProxy proxyHandler() throws IllegalAccessException, InstantiationException {
         return config.framework().newClassInstance(AnnotatedProxy.class, ManagedAtmosphereHandler.class);

@@ -29,8 +29,6 @@ import java.util.concurrent.TimeoutException;
  */
 public class VoidExecutorService implements ExecutorService {
 
-    public final static VoidExecutorService VOID = new VoidExecutorService();
-
     @Override
     public void shutdown() {
     }

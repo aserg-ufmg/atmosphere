@@ -72,7 +72,6 @@ import static org.atmosphere.cpr.FrameworkConfig.INJECTED_ATMOSPHERE_RESOURCE;
  * @author Jeanfrancois Arcand
  */
 public class DefaultBroadcaster implements Broadcaster {
-    public static final int POLLING_DEFAULT = 100;
     public static final String CACHED = DefaultBroadcaster.class.getName() + ".messagesCached";
 
     private static final Logger logger = LoggerFactory.getLogger(DefaultBroadcaster.class);
@@ -112,7 +111,7 @@ public class DefaultBroadcaster implements Broadcaster {
     private final Object[] awaitBarrier = new Object[0];
     private final AtomicBoolean outOfOrderBroadcastSupported = new AtomicBoolean(false);
     protected int writeTimeoutInSecond = -1;
-    protected int waitTime = POLLING_DEFAULT;
+    protected int waitTime = AtmosphereFramework.POLLING_DEFAULT;
     private boolean backwardCompatible;
     private LifecycleHandler lifecycleHandler;
     private Future<?> currentLifecycleTask;

@@ -48,7 +48,7 @@ public class DefaultEndpointMapper<U> implements EndpointMapper<U> {
                 try {
                     t = new UriTemplate(e.getKey());
                     logger.trace("Trying to map {} to {}", t, path);
-                    if (t.match(path, m)) {
+                    if (t.matchURIAndTemplate(path, m)) {
                         handler = e.getValue();
                         logger.trace("Mapped {} to {}", t, e.getValue());
                         break;
@@ -62,7 +62,7 @@ public class DefaultEndpointMapper<U> implements EndpointMapper<U> {
     }
 
     public String computePath(AtmosphereRequest req) {
-        return Utils.pathInfo(req);
+        return Utils.getPathInfo(req);
     }
 
     @Override

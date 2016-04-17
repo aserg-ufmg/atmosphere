@@ -31,6 +31,7 @@ import java.util.Arrays;
 public class JBossWebSocket extends org.atmosphere.websocket.WebSocket {
 
     private final WebSocket webSocket;
+	private Object attachment;
 
     public JBossWebSocket(WebSocket webSocket, AtmosphereConfig config) {
         super(config);
@@ -63,4 +64,21 @@ public class JBossWebSocket extends org.atmosphere.websocket.WebSocket {
             logger.trace("Error closing websocket.", e);
         }
     }
+
+	/**
+	 * Attach an object. Be careful when attaching an object as it can cause memory leak
+	 *
+	 * @oaram object
+	 */
+	public org.atmosphere.websocket.WebSocket attachment(Object attachment) {
+	    this.attachment = attachment;
+	    return this;
+	}
+
+	/**
+	 * Return the attachment
+	 */
+	public Object attachment() {
+	    return attachment;
+	}
 }

@@ -17,6 +17,7 @@ package org.atmosphere.jersey;
 
 import com.sun.jersey.spi.inject.InjectableProvider;
 import org.atmosphere.cpr.AtmosphereResource;
+import org.atmosphere.cpr.Broadcaster;
 import org.atmosphere.cpr.FrameworkConfig;
 
 import javax.servlet.http.HttpServletRequest;
@@ -42,5 +43,9 @@ abstract public class BaseInjectableProvider implements InjectableProvider<Conte
             throw new IllegalStateException("An instance of the class " + injectType.getName() + " could not be injected because there is no HTTP request in scope", ex);
         }
     }
+
+	protected boolean isValidType(Type t) {
+	    return (t instanceof Class) && Broadcaster.class.isAssignableFrom((Class) t);
+	}
 
 }

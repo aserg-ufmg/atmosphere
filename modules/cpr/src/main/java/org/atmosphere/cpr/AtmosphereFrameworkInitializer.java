@@ -28,7 +28,7 @@ import java.util.Map;
 import static org.atmosphere.cpr.ApplicationConfig.META_SERVICE_PATH;
 import static org.atmosphere.cpr.AtmosphereFramework.META_SERVICE;
 
-public class AtmosphereFrameworkInitializer {
+public class AtmosphereFrameworkInitializer implements FrameworkInitializer {
     protected static final Logger logger = LoggerFactory.getLogger(AtmosphereFrameworkInitializer.class);
 
     protected AtmosphereFramework framework;
@@ -40,11 +40,13 @@ public class AtmosphereFrameworkInitializer {
         this.autoDetectHandlers = autoDetectHandlers;
     }
 
-    public AtmosphereFrameworkInitializer configureFramework(ServletConfig sc) throws ServletException {
+    @Override
+	public AtmosphereFrameworkInitializer configureFramework(ServletConfig sc) throws ServletException {
         return configureFramework(sc, true, false, AtmosphereFramework.class);
     }
 
-    public AtmosphereFrameworkInitializer configureFramework(ServletConfig sc, boolean init, boolean useNative, Class<? extends AtmosphereFramework> frameworkClass) throws ServletException {
+    @Override
+	public AtmosphereFrameworkInitializer configureFramework(ServletConfig sc, boolean init, boolean useNative, Class<? extends AtmosphereFramework> frameworkClass) throws ServletException {
         if (framework == null) {
             if (sc.getServletContext().getMajorVersion() > 2) {
                 try {

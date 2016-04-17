@@ -15,7 +15,6 @@
  */
 package org.atmosphere.util;
 
-import org.atmosphere.config.service.DeliverTo;
 import org.atmosphere.cpr.ApplicationConfig;
 import org.atmosphere.cpr.AtmosphereConfig;
 import org.atmosphere.cpr.AtmosphereFramework;
@@ -24,7 +23,6 @@ import org.atmosphere.cpr.AtmosphereRequestImpl;
 import org.atmosphere.cpr.AtmosphereResource;
 import org.atmosphere.cpr.AtmosphereResourceImpl;
 import org.atmosphere.cpr.AtmosphereServlet;
-import org.atmosphere.cpr.Broadcaster;
 import org.atmosphere.cpr.MeteorServlet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,6 +56,7 @@ public class IOUtils {
     private final static Logger logger = LoggerFactory.getLogger(IOUtils.class);
     private final static List<String> knownClasses;
     private final static Pattern SERVLET_PATH_PATTERN = Pattern.compile("([\\/]?[\\w-[.]]+|[\\/]\\*\\*)+");
+	public final static String ATMOSPHERE_SERVLET =  "AtmosphereServlet";
 
     static {
         knownClasses = new ArrayList<String>() {
@@ -70,40 +69,9 @@ public class IOUtils {
         };
     }
 
-    /**
-     * <p>
-     * Delivers the given message according to the specified {@link org.atmosphere.config.service.DeliverTo configuration).
-     * </p>
-     *
-     * @param o              the message
-     * @param deliverConfig  the annotation state
-     * @param defaultDeliver the strategy applied if deliverConfig is {@code null}
-     * @param r              the resource
-     */
-    public static void deliver(final Object o,
-                               final DeliverTo deliverConfig,
-                               final DeliverTo.DELIVER_TO defaultDeliver,
-                               final AtmosphereResource r) {
-        final DeliverTo.DELIVER_TO deliverTo = deliverConfig == null ? defaultDeliver : deliverConfig.value();
-        switch (deliverTo) {
-            case RESOURCE:
-                r.getBroadcaster().broadcast(o, r);
-                break;
-            case BROADCASTER:
-                r.getBroadcaster().broadcast(o);
-                break;
-            case ALL:
-                for (Broadcaster b : r.getAtmosphereConfig().getBroadcasterFactory().lookupAll()) {
-                    b.broadcast(o);
-                }
-                break;
-
-        }
-    }
-
-    public static Object readEntirely(AtmosphereResource r) throws IOException {
+    public static Object readEntirelyBody(AtmosphereResource r) throws IOException {
         AtmosphereRequest request = r.getRequest();
-        return isBodyBinary(request) ? readEntirelyAsByte(r) : readEntirelyAsString(r).toString();
+        return isBodyBinary(request) ? readEntirelyAsByte(r) : readEntirelyBodyAsString(r).toString();
     }
 
     public final static boolean isBodyBinary(AtmosphereRequest request) {
@@ -122,7 +90,7 @@ public class IOUtils {
         }
     }
 
-    public static StringBuilder readEntirelyAsString(AtmosphereResource r) throws IOException {
+    public static StringBuilder readEntirelyBodyAsString(AtmosphereResource r) throws IOException {
         final StringBuilder stringBuilder = new StringBuilder();
 
         boolean readGetBody = r.getAtmosphereConfig().getInitParameter(ApplicationConfig.READ_GET_BODY, false);
@@ -232,7 +200,7 @@ public class IOUtils {
             return bbIS.toByteArray();
         } else if (body.hasString()) {
             try {
-                return readEntirelyAsString(r).toString().getBytes(request.getCharacterEncoding());
+                return readEntirelyBodyAsString(r).toString().getBytes(request.getCharacterEncoding());
             } catch (UnsupportedEncodingException e) {
                 logger.error("", e);
             }
@@ -259,7 +227,7 @@ public class IOUtils {
                 ServletRegistration s = config.getServletContext().getServletRegistration(config.getServletConfig().getServletName());
 
                 if (s == null) {
-                    s = config.getServletContext().getServletRegistration(VoidServletConfig.ATMOSPHERE_SERVLET);
+                    s = config.getServletContext().getServletRegistration(IOUtils.ATMOSPHERE_SERVLET);
                 }
 
                 if ( s == null) {
@@ -374,20 +342,6 @@ public class IOUtils {
         }
     }
 
-    public static boolean isAtmosphere(String className) {
-        Class<? extends AtmosphereServlet> clazz;
-        try {
-            clazz = (Class<? extends AtmosphereServlet>) Thread.currentThread().getContextClassLoader().loadClass(className);
-        } catch (Throwable t) {
-            try {
-                clazz = (Class<? extends AtmosphereServlet>) IOUtils.class.getClassLoader().loadClass(className);
-            } catch (Exception ex) {
-                return false;
-            }
-        }
-        return AtmosphereServlet.class.isAssignableFrom(clazz);
-    }
-
     /**
      * <p>
      * This method reads the given file stored under "META-INF/services" and accessed through the framework's class loader
@@ -496,4 +450,5 @@ public class IOUtils {
         }
         return realPath;
     }
+
 }

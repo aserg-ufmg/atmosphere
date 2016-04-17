@@ -162,7 +162,7 @@ public class Jetty9AsyncSupportWithWebSocket extends Servlet30CometSupport {
         Boolean b = (Boolean) req.getAttribute(WebSocket.WEBSOCKET_INITIATED);
         if (b == null) b = Boolean.FALSE;
 
-        if (!Utils.webSocketEnabled(req) && req.getAttribute(WebSocket.WEBSOCKET_ACCEPT_DONE) == null) {
+        if (!Utils.webSocketEnabled(req) && req.getAttribute(JettyWebSocketUtil.WEBSOCKET_ACCEPT_DONE) == null) {
             if (req.resource() != null && req.resource().transport() == AtmosphereResource.TRANSPORT.WEBSOCKET) {
                 WebSocket.notSupported(req, res);
                 return Action.CANCELLED;
@@ -173,7 +173,7 @@ public class Jetty9AsyncSupportWithWebSocket extends Servlet30CometSupport {
             if (webSocketFactory != null && !b) {
                 req.setAttribute(WebSocket.WEBSOCKET_INITIATED, true);
                 webSocketFactory.acceptWebSocket(req, res);
-                req.setAttribute(WebSocket.WEBSOCKET_ACCEPT_DONE, true);
+                req.setAttribute(JettyWebSocketUtil.WEBSOCKET_ACCEPT_DONE, true);
                 return new Action();
             }
 

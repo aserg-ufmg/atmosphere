@@ -25,7 +25,10 @@ import org.atmosphere.interceptor.InvokationOrder;
  */
 public abstract class AtmosphereInterceptorAdapter implements AtmosphereInterceptor, InvokationOrder {
 
-    @Override
+    protected static final String OUT_ENCODING = "UTF-8";
+	protected AtmosphereConfig config;
+
+	@Override
     public void configure(AtmosphereConfig config) {
     }
 

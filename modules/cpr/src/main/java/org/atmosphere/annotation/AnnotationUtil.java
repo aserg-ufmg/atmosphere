@@ -81,7 +81,7 @@ public class AnnotationUtil {
     public static void interceptorsForManagedService(AtmosphereFramework framework, List<Class<? extends AtmosphereInterceptor>> interceptors, List<AtmosphereInterceptor> l, boolean checkDuplicate) {
         for (Class<? extends AtmosphereInterceptor> i : interceptors) {
             if (!framework.excludedInterceptors().contains(i.getName())
-                    && (!checkDuplicate || checkDefault(i))) {
+                    && (!checkDuplicate || (!MANAGED_ATMOSPHERE_INTERCEPTORS.contains(i) && !AtmosphereFramework.DEFAULT_ATMOSPHERE_INTERCEPTORS.contains(i)))) {
                 try {
                     logger.info("Adding {}", i);
                     l.add(framework.newClassInstance(AtmosphereInterceptor.class, i));
@@ -105,12 +105,6 @@ public class AnnotationUtil {
             }
         }
     }
-
-    public static boolean checkDefault(Class<? extends AtmosphereInterceptor> i) {
-        return !MANAGED_ATMOSPHERE_INTERCEPTORS.contains(i) && !AtmosphereFramework.DEFAULT_ATMOSPHERE_INTERCEPTORS.contains(i);
-    }
-
-
 
     public static AtmosphereInterceptor listeners(final Class<? extends AtmosphereResourceEventListener>[] listeners, final AtmosphereFramework framework) {
         if (listeners.length > 0) {

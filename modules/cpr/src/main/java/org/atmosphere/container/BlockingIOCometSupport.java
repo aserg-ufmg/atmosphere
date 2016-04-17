@@ -20,8 +20,6 @@ import org.atmosphere.cpr.AsyncSupport;
 import org.atmosphere.cpr.AsynchronousProcessor;
 import org.atmosphere.cpr.AtmosphereConfig;
 import org.atmosphere.cpr.AtmosphereRequest;
-import org.atmosphere.cpr.AtmosphereResource;
-import org.atmosphere.cpr.AtmosphereResourceEvent;
 import org.atmosphere.cpr.AtmosphereResourceImpl;
 import org.atmosphere.cpr.AtmosphereResponse;
 import org.atmosphere.cpr.Broadcaster;
@@ -31,7 +29,6 @@ import org.slf4j.LoggerFactory;
 import javax.servlet.ServletException;
 import java.io.IOException;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 
 import static org.atmosphere.cpr.AtmosphereResourceEventListenerAdapter.OnResume;
 
@@ -46,9 +43,9 @@ import static org.atmosphere.cpr.AtmosphereResourceEventListenerAdapter.OnResume
  */
 public class BlockingIOCometSupport extends AsynchronousProcessor {
 
-    private static final Logger logger = LoggerFactory.getLogger(BlockingIOCometSupport.class);
+    public static final Logger logger = LoggerFactory.getLogger(BlockingIOCometSupport.class);
 
-    protected static final String LATCH = BlockingIOCometSupport.class.getName() + ".latch";
+    public static final String LATCH = BlockingIOCometSupport.class.getName() + ".latch";
 
     public BlockingIOCometSupport(AtmosphereConfig config) {
         super(config);
@@ -114,48 +111,6 @@ public class BlockingIOCometSupport extends AsynchronousProcessor {
             }
         }
         return action;
-    }
-
-    /**
-     * Suspend the connection by blocking the current {@link Thread}
-     *
-     * @param action The {@link Action}
-     * @param req    the {@link AtmosphereRequest}
-     * @param res    the {@link AtmosphereResponse}
-     * @throws java.io.IOException
-     * @throws javax.servlet.ServletException
-     */
-    protected void suspend(Action action, AtmosphereRequest req, AtmosphereResponse res)
-            throws IOException, ServletException {
-
-        final CountDownLatch latch = new CountDownLatch(1);
-        req.setAttribute(LATCH, latch);
-
-        boolean ok = true;
-        AtmosphereResource resource = req.resource();
-        if (resource != null) {
-            try {
-                resource.addEventListener(new OnResume() {
-                    @Override
-                    public void onResume(AtmosphereResourceEvent event) {
-                        latch.countDown();
-                    }
-                });
-                if (action.timeout() != -1) {
-                    ok = latch.await(action.timeout(), TimeUnit.MILLISECONDS);
-                } else {
-                    latch.await();
-                }
-            } catch (InterruptedException ex) {
-                logger.trace("", ex);
-            } finally {
-                if (!ok) {
-                    timedout(req, res);
-                } else {
-                    AtmosphereResourceImpl.class.cast(resource).cancel();
-                }
-            }
-        }
     }
 
     @Override

@@ -1,4 +1,4 @@
-package org.atmosphere.util.annotation;/*
+package org.atmosphere.util.annotation.iterator;/*
  * Copyright 2016 Async-IO.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not

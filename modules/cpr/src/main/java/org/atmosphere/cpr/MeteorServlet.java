@@ -132,4 +132,8 @@ public class MeteorServlet extends AtmosphereServlet {
     public void destroy() {
         super.destroy();
     }
+
+	protected AtmosphereFramework newAtmosphereFramework() {
+	    return initializer.newAtmosphereFramework(AtmosphereFramework.class);
+	}
 }

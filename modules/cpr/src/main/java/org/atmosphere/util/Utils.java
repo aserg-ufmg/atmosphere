@@ -84,14 +84,6 @@ public final class Utils {
         return false;
     }
 
-    public final static boolean firefoxWebSocketEnabled(HttpServletRequest request) {
-        return webSocketEnabled(request)
-                && request.getHeader(HeaderConfig.X_ATMO_PROTOCOL) != null
-                && request.getHeader(HeaderConfig.X_ATMO_PROTOCOL).equals("true")
-                && request.getHeader("User-Agent") != null
-                && request.getHeader("User-Agent").toLowerCase().indexOf("firefox") != -1;
-    }
-
     public final static boolean twoConnectionsTransport(AtmosphereResource.TRANSPORT t) {
         switch (t) {
             case JSONP:
@@ -156,25 +148,6 @@ public final class Utils {
     public final static boolean webSocketMessage(AtmosphereResource r) {
         AtmosphereRequest request = AtmosphereResourceImpl.class.cast(r).getRequest(false);
         return request.getAttribute(FrameworkConfig.WEBSOCKET_MESSAGE) != null;
-    }
-
-    public static boolean properProtocol(HttpServletRequest request) {
-        Enumeration<String> connection = request.getHeaders("Connection");
-        if (connection == null || !connection.hasMoreElements()) {
-            connection = request.getHeaders("connection");
-        }
-
-        boolean isOK = false;
-        boolean isWebSocket = (request.getHeader("sec-websocket-version") != null || request.getHeader("Sec-WebSocket-Draft") != null);
-        if (connection != null && connection.hasMoreElements()) {
-            String[] e = connection.nextElement().toString().split(",");
-            for (String upgrade : e) {
-                if (upgrade.trim().equalsIgnoreCase("upgrade")) {
-                    isOK = true;
-                }
-            }
-        }
-        return isWebSocket ? isOK : true;
     }
 
     public static final AtmosphereResource websocketResource(AtmosphereResource r) {
@@ -279,22 +252,6 @@ public final class Utils {
         return result;
     }
 
-    public final static Set<Method> getInheritedPrivateMethod(Class<?> type) {
-        Set<Method> result = new HashSet<>();
-
-        Class<?> i = type;
-        while (i != null && i != Object.class) {
-            for (Method m : i.getDeclaredMethods()) {
-                if (!m.isSynthetic()) {
-                    result.add(m);
-                }
-            }
-            i = i.getSuperclass();
-        }
-
-        return result;
-    }
-
     public final static boolean requestScopedInjection(AtmosphereConfig config, AtmosphereHandler h) {
         AtmosphereObjectFactory injectableFactory = config.framework().objectFactory();
         if (!InjectableObjectFactory.class.isAssignableFrom(injectableFactory.getClass())) {
@@ -342,7 +299,7 @@ public final class Utils {
         }
     }
 
-    public static String pathInfo(AtmosphereRequest request) {
+    public static String getPathInfo(AtmosphereRequest request) {
         String pathInfo = null;
         String path = null;
         try {

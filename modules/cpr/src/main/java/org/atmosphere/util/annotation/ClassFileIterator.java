@@ -36,6 +36,8 @@
  */
 package org.atmosphere.util.annotation;
 
+import org.atmosphere.util.annotation.iterator.FileIterator;
+import org.atmosphere.util.annotation.iterator.InputStreamIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

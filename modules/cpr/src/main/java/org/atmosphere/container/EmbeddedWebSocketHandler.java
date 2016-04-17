@@ -119,7 +119,9 @@ public class EmbeddedWebSocketHandler {
 
     private final class ArrayBaseWebSocket extends WebSocket {
 
-        public ArrayBaseWebSocket() {
+        private Object attachment;
+
+		public ArrayBaseWebSocket() {
             super(framework.getAtmosphereConfig());
         }
 
@@ -143,6 +145,23 @@ public class EmbeddedWebSocketHandler {
         @Override
         public void close() {
         }
+
+		/**
+		 * Attach an object. Be careful when attaching an object as it can cause memory leak
+		 *
+		 * @oaram object
+		 */
+		public WebSocket attachment(Object attachment) {
+		    this.attachment = attachment;
+		    return this;
+		}
+
+		/**
+		 * Return the attachment
+		 */
+		public Object attachment() {
+		    return attachment;
+		}
     }
 
     public static void main(String... args) throws IOException {
@@ -152,7 +171,7 @@ public class EmbeddedWebSocketHandler {
     public static AtmosphereHandler ECHO_ATMOSPHEREHANDLER = new AbstractReflectorAtmosphereHandler() {
         @Override
         public void onRequest(AtmosphereResource resource) throws IOException {
-            String body = IOUtils.readEntirelyAsString(resource).toString();
+            String body = IOUtils.readEntirelyBodyAsString(resource).toString();
             if (!body.isEmpty()) {
                 resource.getBroadcaster().broadcast(body);
             }

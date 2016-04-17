@@ -39,7 +39,6 @@ import java.util.ServiceLoader;
 import java.util.Set;
 
 import static org.atmosphere.util.Utils.getInheritedPrivateFields;
-import static org.atmosphere.util.Utils.getInheritedPrivateMethod;
 
 /**
  * Support injection of Atmosphere's Internal object using
@@ -204,7 +203,7 @@ public class InjectableObjectFactory implements AtmosphereObjectFactory<Injectab
      */
     public <U> void applyMethods(U instance, Class<U> defaultType) throws IllegalAccessException {
         if (!pushBackInjection.contains(instance)) {
-            Set<Method> methods = (getInheritedPrivateMethod(defaultType));
+            Set<Method> methods = (InjectableObjectFactory.getInheritedPrivateMethod(defaultType));
             injectMethods(methods, instance);
         }
     }
@@ -477,4 +476,20 @@ public class InjectableObjectFactory implements AtmosphereObjectFactory<Injectab
             }
         }
     }
+
+	public final static Set<Method> getInheritedPrivateMethod(Class<?> type) {
+	    Set<Method> result = new HashSet<>();
+	
+	    Class<?> i = type;
+	    while (i != null && i != Object.class) {
+	        for (Method m : i.getDeclaredMethods()) {
+	            if (!m.isSynthetic()) {
+	                result.add(m);
+	            }
+	        }
+	        i = i.getSuperclass();
+	    }
+	
+	    return result;
+	}
 }

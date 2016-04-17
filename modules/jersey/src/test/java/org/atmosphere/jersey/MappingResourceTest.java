@@ -32,10 +32,6 @@ import static org.testng.Assert.fail;
  */
 public class MappingResourceTest extends BaseTest {
 
-    String getUrlTarget(int port) {
-        return "http://127.0.0.1:" + port + "/jfarcand@apache.org";
-    }
-
     @Test(timeOut = 20000, enabled = true)
     public void testSpecialCharsMapping() {
         logger.info("{}: running test:  testSpecialCharsMapping", getClass().getSimpleName());

@@ -221,18 +221,7 @@ public class AtmosphereFilter implements ResourceFilterFactory {
             AtmosphereFramework atmosphereFramework = config.framework();
 
             String p = config.getInitParameter(JERSEY_CONTAINER_RESPONSE_WRITER_CLASS);
-            ContainerResponseWriter w;
-            if (p != null) {
-                try {
-                    w = (ContainerResponseWriter) Thread.currentThread().getContextClassLoader().loadClass(p).newInstance();
-                    logger.trace("Installing ContainerResponseWriter {}", p);
-                } catch (Throwable e) {
-                    logger.error("Error loading ContainerResponseWriter {}", p, e);
-                }
-            }
-
-            // Now check if it was defined as an attribute
-            w = (ContainerResponseWriter) servletReq.getAttribute(FrameworkConfig.JERSEY_CONTAINER_RESPONSE_WRITER_INSTANCE);
+            ContainerResponseWriter w = getContainerResponseWriter(p);
             if (w != null) {
                 response.setContainerResponseWriter(w);
             }
@@ -834,16 +823,9 @@ public class AtmosphereFilter implements ResourceFilterFactory {
         }
 
         if (am.isAnnotationPresent(Broadcast.class)) {
-            int delay = am.getAnnotation(Broadcast.class).delay();
+            
             Class[] broadcastFilter = am.getAnnotation(Broadcast.class).filters();
-
-            if (am.getAnnotation(Broadcast.class).resumeOnBroadcast()) {
-                f = new Filter(Action.RESUME_ON_BROADCAST, delay, 0, Suspend.SCOPE.APPLICATION, broadcastFilter, null,
-                        am.getAnnotation(Broadcast.class).writeEntity());
-            } else {
-                f = new Filter(Action.BROADCAST, delay, 0, Suspend.SCOPE.APPLICATION, broadcastFilter, null,
-                        am.getAnnotation(Broadcast.class).writeEntity());
-            }
+            f = getFilterForAnnotation(am, broadcastFilter);
 
             list.addLast(f);
 
@@ -951,6 +933,19 @@ public class AtmosphereFilter implements ResourceFilterFactory {
         return list;
     }
 
+	private Filter getFilterForAnnotation(AbstractMethod am, Class[] broadcastFilter) {
+		Filter f;
+		int delay = am.getAnnotation(Broadcast.class).delay();
+		if (am.getAnnotation(Broadcast.class).resumeOnBroadcast()) {
+		    f = new Filter(Action.RESUME_ON_BROADCAST, delay, 0, Suspend.SCOPE.APPLICATION, broadcastFilter, null,
+		            am.getAnnotation(Broadcast.class).writeEntity());
+		} else {
+		    f = new Filter(Action.BROADCAST, delay, 0, Suspend.SCOPE.APPLICATION, broadcastFilter, null,
+		            am.getAnnotation(Broadcast.class).writeEntity());
+		}
+		return f;
+	}
+
     protected long translateTimeUnit(long period, TimeUnit tu) {
         if (period == -1) return period;
 
@@ -972,5 +967,21 @@ public class AtmosphereFilter implements ResourceFilterFactory {
         }
         return period;
     }
+
+	private ContainerResponseWriter getContainerResponseWriter(String p) {
+		ContainerResponseWriter w;
+		if (p != null) {
+		    try {
+		        w = (ContainerResponseWriter) Thread.currentThread().getContextClassLoader().loadClass(p).newInstance();
+		        logger.trace("Installing ContainerResponseWriter {}", p);
+		    } catch (Throwable e) {
+		        logger.error("Error loading ContainerResponseWriter {}", p, e);
+		    }
+		}
+
+		// Now check if it was defined as an attribute
+		w = (ContainerResponseWriter) servletReq.getAttribute(FrameworkConfig.JERSEY_CONTAINER_RESPONSE_WRITER_INSTANCE);
+		return w;
+	}
 
 }

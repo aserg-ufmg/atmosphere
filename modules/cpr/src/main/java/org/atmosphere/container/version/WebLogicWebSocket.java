@@ -25,6 +25,7 @@ import java.util.Arrays;
 public class WebLogicWebSocket extends WebSocket {
 
     private final WebSocketConnection webSocketConnection;
+	private Object attachment;
 
     public WebLogicWebSocket(WebSocketConnection webSocketConnection, AtmosphereConfig config) {
         super(config);
@@ -57,6 +58,25 @@ public class WebLogicWebSocket extends WebSocket {
             e.printStackTrace();
         }
     }
+
+
+	/**
+	 * Attach an object. Be careful when attaching an object as it can cause memory leak
+	 *
+	 * @oaram object
+	 */
+	public WebSocket attachment(Object attachment) {
+	    this.attachment = attachment;
+	    return this;
+	}
+
+
+	/**
+	 * Return the attachment
+	 */
+	public Object attachment() {
+	    return attachment;
+	}
 
 
 }

@@ -25,6 +25,7 @@ import java.nio.ByteBuffer;
 public class Jetty9WebSocket extends WebSocket {
 
     private final Session webSocketConnection;
+	private Object attachment;
 
     public Jetty9WebSocket(Session webSocketConnection, AtmosphereConfig config) {
         super(config);
@@ -59,4 +60,21 @@ public class Jetty9WebSocket extends WebSocket {
             logger.trace("Close error", e);
         }
     }
+
+	/**
+	 * Attach an object. Be careful when attaching an object as it can cause memory leak
+	 *
+	 * @oaram object
+	 */
+	public WebSocket attachment(Object attachment) {
+	    this.attachment = attachment;
+	    return this;
+	}
+
+	/**
+	 * Return the attachment
+	 */
+	public Object attachment() {
+	    return attachment;
+	}
 }

@@ -40,6 +40,8 @@ import static org.atmosphere.cpr.ApplicationConfig.PROPERTY_SESSION_CREATE;
 public class JettyWebSocketUtil {
 
     private static final Logger logger = LoggerFactory.getLogger(JettyWebSocketUtil.class);
+    
+    public final static String WEBSOCKET_ACCEPT_DONE = WebSocket.class.getName() + ".acceptDone";
 
     public final static Action doService(AsynchronousProcessor cometSupport,
                                          AtmosphereRequest req,
@@ -49,7 +51,7 @@ public class JettyWebSocketUtil {
         Boolean b = (Boolean) req.getAttribute(WebSocket.WEBSOCKET_INITIATED);
         if (b == null) b = Boolean.FALSE;
 
-        if (!Utils.webSocketEnabled(req) && req.getAttribute(WebSocket.WEBSOCKET_ACCEPT_DONE) == null) {
+        if (!Utils.webSocketEnabled(req) && req.getAttribute(JettyWebSocketUtil.WEBSOCKET_ACCEPT_DONE) == null) {
             if (req.resource() != null && req.resource().transport() == AtmosphereResource.TRANSPORT.WEBSOCKET) {
                 WebSocket.notSupported(req, res);
                 return Action.CANCELLED;
@@ -66,7 +68,7 @@ public class JettyWebSocketUtil {
                     WebSocket.notSupported(req, res);
                     return Action.CANCELLED;
                 }
-                req.setAttribute(WebSocket.WEBSOCKET_ACCEPT_DONE, true);
+                req.setAttribute(JettyWebSocketUtil.WEBSOCKET_ACCEPT_DONE, true);
                 return new Action();
             }
 
@@ -151,4 +153,6 @@ public class JettyWebSocketUtil {
 
         return webSocketFactory;
     }
+
+	
 }

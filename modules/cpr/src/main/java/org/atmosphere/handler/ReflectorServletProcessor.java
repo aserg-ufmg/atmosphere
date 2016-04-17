@@ -65,8 +65,6 @@ public class ReflectorServletProcessor extends AbstractReflectorAtmosphereHandle
     private final FilterChainServletWrapper wrapper = new FilterChainServletWrapper();
     private final AtmosphereFilterChain filterChain = new AtmosphereFilterChain();
     private Servlet servlet;
-    private AtmosphereConfig config;
-
     public ReflectorServletProcessor() {
     }
 

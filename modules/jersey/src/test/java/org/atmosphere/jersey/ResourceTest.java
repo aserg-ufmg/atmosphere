@@ -36,7 +36,7 @@ import static org.testng.Assert.assertNotNull;
 
 @Path("/{topic}")
 @Produces("text/plain;charset=ISO-8859-1")
-public class TestResource {
+public class ResourceTest {
 
     private
     @PathParam("topic")

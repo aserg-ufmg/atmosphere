@@ -87,7 +87,7 @@ public class DefaultMetaBroadcaster implements MetaBroadcaster {
                 t = new UriTemplate(path);
                 for (Broadcaster b : c) {
                     logger.trace("Trying to map {} to {}", t, b.getID());
-                    if (t.match(b.getID(), m)) {
+                    if (t.matchURIAndTemplate(b.getID(), m)) {
                         l.add(b);
                     }
                     m.clear();

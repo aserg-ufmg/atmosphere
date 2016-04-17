@@ -21,7 +21,7 @@ import org.atmosphere.config.service.AtmosphereHandlerService;
 import org.atmosphere.cpr.AtmosphereFramework;
 import org.atmosphere.cpr.AtmosphereHandler;
 import org.atmosphere.cpr.AtmosphereInterceptor;
-import org.atmosphere.util.IntrospectionUtils;
+import org.atmosphere.util.tools.IntrospectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,16 +46,7 @@ public class AtmosphereHandlerServiceProcessor implements Processor<AtmosphereHa
             atmosphereConfig(a.atmosphereConfig(), framework);
             filters(a.broadcastFilters(), framework);
 
-            Class<?>[] interceptors = a.interceptors();
-            LinkedList<AtmosphereInterceptor> l = new LinkedList<AtmosphereInterceptor>();
-            for (Class i : interceptors) {
-                try {
-                    AtmosphereInterceptor ai = (AtmosphereInterceptor) framework.newClassInstance(AtmosphereHandler.class, i);
-                    l.add(ai);
-                } catch (Throwable e) {
-                    logger.warn("", e);
-                }
-            }
+            LinkedList<AtmosphereInterceptor> l = getListAtmosphereInterceptor(framework, a);
 
             AtmosphereInterceptor aa = listeners(a.listeners(), framework);
             if (aa != null) {
@@ -82,4 +73,19 @@ public class AtmosphereHandlerServiceProcessor implements Processor<AtmosphereHa
             logger.warn("", e);
         }
     }
+
+	private LinkedList<AtmosphereInterceptor> getListAtmosphereInterceptor(AtmosphereFramework framework,
+			AtmosphereHandlerService handlerService) {
+		Class<?>[] interceptors = handlerService.interceptors();
+		LinkedList<AtmosphereInterceptor> l = new LinkedList<AtmosphereInterceptor>();
+		for (Class i : interceptors) {
+		    try {
+		        AtmosphereInterceptor ai = (AtmosphereInterceptor) framework.newClassInstance(AtmosphereHandler.class, i);
+		        l.add(ai);
+		    } catch (Throwable e) {
+		        logger.warn("", e);
+		    }
+		}
+		return l;
+	}
 }

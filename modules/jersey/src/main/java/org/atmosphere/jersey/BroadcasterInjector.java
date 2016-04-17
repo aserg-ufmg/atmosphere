@@ -35,10 +35,6 @@ import java.lang.reflect.Type;
  */
 abstract class BroadcasterInjector extends BaseInjectableProvider {
 
-    boolean isValidType(Type t) {
-        return (t instanceof Class) && Broadcaster.class.isAssignableFrom((Class) t);
-    }
-
     public static final class PerRequest extends BroadcasterInjector {
         @Override
         public ComponentScope getScope() {

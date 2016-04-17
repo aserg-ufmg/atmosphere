@@ -55,7 +55,7 @@ public class ContainerInitializer implements javax.servlet.ServletContainerIniti
                 continue;
             }
 
-            if (c.getAttribute(reg.getKey()) == null && IOUtils.isAtmosphere(reg.getValue().getClassName())) {
+            if (c.getAttribute(reg.getKey()) == null && ContainerInitializer.isAtmosphere(reg.getValue().getClassName())) {
                 final AtmosphereFramework framework = AtmosphereFrameworkInitializer.newAtmosphereFramework(c, false, true);
                 // Hack to make jsr356 works. Pretty ugly.
                 DefaultAsyncSupportResolver resolver = new DefaultAsyncSupportResolver(framework.getAtmosphereConfig());
@@ -126,4 +126,18 @@ public class ContainerInitializer implements javax.servlet.ServletContainerIniti
             }
         }
     }
+
+	public static boolean isAtmosphere(String className) {
+	    Class<? extends AtmosphereServlet> clazz;
+	    try {
+	        clazz = (Class<? extends AtmosphereServlet>) Thread.currentThread().getContextClassLoader().loadClass(className);
+	    } catch (Throwable t) {
+	        try {
+	            clazz = (Class<? extends AtmosphereServlet>) IOUtils.class.getClassLoader().loadClass(className);
+	        } catch (Exception ex) {
+	            return false;
+	        }
+	    }
+	    return AtmosphereServlet.class.isAssignableFrom(clazz);
+	}
 }

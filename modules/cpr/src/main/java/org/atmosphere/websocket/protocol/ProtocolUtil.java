@@ -38,7 +38,8 @@ public class ProtocolUtil {
 
         AtmosphereResource resource = webSocket.resource();
         AtmosphereRequest request = AtmosphereResourceImpl.class.cast(resource).getRequest(false);
-        Map<String, Object> m = attributes(webSocket, request);
+		Map<String, Object> m = new ConcurrentHashMap<String, Object>();
+		m.putAll(webSocket.attributes());
 
         // We need to create a new AtmosphereRequest as WebSocket message may arrive concurrently on the same connection.
         AtmosphereRequestImpl.Builder b = (new AtmosphereRequestImpl.Builder()
@@ -55,11 +56,5 @@ public class ProtocolUtil {
                 .headers(request.headersMap())
                 .session(resource.session()));
         return b;
-    }
-
-    private static Map<String, Object> attributes(WebSocket webSocket, AtmosphereRequest request) {
-        Map<String, Object> m = new ConcurrentHashMap<String, Object>();
-        m.putAll(webSocket.attributes());
-        return m;
     }
 }

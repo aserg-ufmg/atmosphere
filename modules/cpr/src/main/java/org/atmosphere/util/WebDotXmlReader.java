@@ -50,7 +50,7 @@ public class WebDotXmlReader {
     public WebDotXmlReader(InputStream stream) {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         try {
-            parse(factory.newDocumentBuilder().parse(stream));
+            parseDocumentXML(factory.newDocumentBuilder().parse(stream));
         } catch (SAXException e) {
             logger.error(e.getMessage(), e);
             throw new RuntimeException(e);
@@ -68,7 +68,7 @@ public class WebDotXmlReader {
      *
      * @param document
      */
-    private void parse(Document document) {
+    private void parseDocumentXML(Document document) {
         Element element = document.getDocumentElement();
         NodeList servlets = element.getElementsByTagName("servlet");
         String atmosphereServletName = null;

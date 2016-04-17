@@ -34,8 +34,8 @@ import java.util.List;
  *
  * @author Jeanfrancois Arcand
  */
-public class EchoProtocol implements WebSocketProtocol {
-    private static final Logger logger = LoggerFactory.getLogger(EchoProtocol.class);
+public class ProtocolEcho implements WebSocketProtocol {
+    private static final Logger logger = LoggerFactory.getLogger(ProtocolEcho.class);
 
     @Override
     public List<AtmosphereRequest> onMessage(WebSocket webSocket, String data) {

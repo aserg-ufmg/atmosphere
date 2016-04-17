@@ -17,6 +17,7 @@ package org.atmosphere.config.managed;
 
 import org.atmosphere.config.service.Delete;
 import org.atmosphere.config.service.DeliverTo;
+import org.atmosphere.config.service.DeliverTo.DELIVER_TO;
 import org.atmosphere.config.service.Disconnect;
 import org.atmosphere.config.service.Get;
 import org.atmosphere.config.service.Heartbeat;
@@ -35,9 +36,9 @@ import org.atmosphere.cpr.AtmosphereResourceEvent;
 import org.atmosphere.cpr.AtmosphereResourceFactory;
 import org.atmosphere.cpr.AtmosphereResourceHeartbeatEventListener;
 import org.atmosphere.cpr.AtmosphereResourceImpl;
+import org.atmosphere.cpr.Broadcaster;
 import org.atmosphere.handler.AbstractReflectorAtmosphereHandler;
 import org.atmosphere.handler.AnnotatedProxy;
-import org.atmosphere.util.IOUtils;
 import org.atmosphere.util.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,7 +61,7 @@ import static org.atmosphere.cpr.AtmosphereResourceEventListenerAdapter.OnClose;
 import static org.atmosphere.cpr.AtmosphereResourceEventListenerAdapter.OnResume;
 import static org.atmosphere.cpr.AtmosphereResourceEventListenerAdapter.OnSuspend;
 import static org.atmosphere.util.IOUtils.isBodyEmpty;
-import static org.atmosphere.util.IOUtils.readEntirely;
+import static org.atmosphere.util.IOUtils.readEntirelyBody;
 
 /**
  * An internal implementation of {@link AtmosphereHandler} that implement support for Atmosphere 2.0 annotations.
@@ -84,7 +85,6 @@ public class ManagedAtmosphereHandler extends AbstractReflectorAtmosphereHandler
     private Method onDeleteMethod;
     private Method onReadyMethod;
     private Method onResumeMethod;
-    private AtmosphereConfig config;
     protected boolean pathParams;
     protected AtmosphereResourceFactory resourcesFactory;
 
@@ -159,7 +159,7 @@ public class ManagedAtmosphereHandler extends AbstractReflectorAtmosphereHandler
         } else if (method.equalsIgnoreCase("post")) {
             Object body = null;
             if (onPostMethod != null) {
-                body = readEntirely(resource);
+                body = readEntirelyBody(resource);
                 if (body != null && String.class.isAssignableFrom(body.getClass())) {
                     resource.getRequest().body((String) body);
                 } else if (body != null) {
@@ -174,7 +174,7 @@ public class ManagedAtmosphereHandler extends AbstractReflectorAtmosphereHandler
                 if ( e.methodInfo.deliverTo == DeliverTo.DELIVER_TO.RESOURCE && !resource.transport().equals(AtmosphereResource.TRANSPORT.WEBSOCKET)) {
                     r = resourcesFactory.find(resource.uuid());
                 }
-                IOUtils.deliver(new Managed(e.encodedObject), null, e.methodInfo.deliverTo, r);
+                ManagedAtmosphereHandler.deliver(new Managed(e.encodedObject), null, e.methodInfo.deliverTo, r);
             }
         } else if (method.equalsIgnoreCase("delete")) {
             invoke(onDeleteMethod, resource);
@@ -344,7 +344,7 @@ public class ManagedAtmosphereHandler extends AbstractReflectorAtmosphereHandler
                 } else if (m.useStream) {
                     o = request.getInputStream();
                 } else if (o == null) {
-                    o = readEntirely(resource);
+                    o = readEntirelyBody(resource);
                     if (isBodyEmpty(o)) {
                         logger.warn("{} received an empty body", request);
                         return null;
@@ -424,7 +424,7 @@ public class ManagedAtmosphereHandler extends AbstractReflectorAtmosphereHandler
             deliverTo = onReadyMethod.getAnnotation(DeliverTo.class);
         }
 
-        IOUtils.deliver(message(onReadyMethod, r), deliverTo, DeliverTo.DELIVER_TO.RESOURCE, r);
+        ManagedAtmosphereHandler.deliver(message(onReadyMethod, r), deliverTo, DeliverTo.DELIVER_TO.RESOURCE, r);
     }
 
     /**
@@ -446,7 +446,38 @@ public class ManagedAtmosphereHandler extends AbstractReflectorAtmosphereHandler
         return "ManagedAtmosphereHandler proxy for " + proxiedInstance.getClass().getName();
     }
 
-    public final static class MethodInfo {
+    /**
+	 * <p>
+	 * Delivers the given message according to the specified {@link org.atmosphere.config.service.DeliverTo configuration).
+	 * </p>
+	 *
+	 * @param o              the message
+	 * @param deliverConfig  the annotation state
+	 * @param defaultDeliver the strategy applied if deliverConfig is {@code null}
+	 * @param r              the resource
+	 */
+	public static void deliver(final Object o,
+	                           final DeliverTo deliverConfig,
+	                           final DeliverTo.DELIVER_TO defaultDeliver,
+	                           final AtmosphereResource r) {
+	    final DeliverTo.DELIVER_TO deliverTo = deliverConfig == null ? defaultDeliver : deliverConfig.value();
+	    switch (deliverTo) {
+	        case RESOURCE:
+	            r.getBroadcaster().broadcast(o, r);
+	            break;
+	        case BROADCASTER:
+	            r.getBroadcaster().broadcast(o);
+	            break;
+	        case ALL:
+	            for (Broadcaster b : r.getAtmosphereConfig().getBroadcasterFactory().lookupAll()) {
+	                b.broadcast(o);
+	            }
+	            break;
+	
+	    }
+	}
+
+	public final static class MethodInfo {
 
         final Method method;
         final DeliverTo.DELIVER_TO deliverTo;

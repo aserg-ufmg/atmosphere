@@ -343,7 +343,7 @@ public class UriTemplate {
      * @throws IllegalArgumentException if the uri or
      *         templateVariableToValue is null.
      */
-    public final boolean match(CharSequence uri, Map<String, String> templateVariableToValue) throws
+    public final boolean matchURIAndTemplate(CharSequence uri, Map<String, String> templateVariableToValue) throws
             IllegalArgumentException {
         if (templateVariableToValue == null) 
             throw new IllegalArgumentException();

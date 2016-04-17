@@ -73,14 +73,11 @@ import static org.atmosphere.cpr.ApplicationConfig.RESUME_ON_HEARTBEAT;
  */
 public class HeartbeatInterceptor extends AtmosphereInterceptorAdapter {
     public final static String INTERCEPTOR_ADDED = HeartbeatInterceptor.class.getName();
-    public final static String HEARTBEAT_FUTURE = "heartbeat.future";
-
     private static final Logger logger = LoggerFactory.getLogger(HeartbeatInterceptor.class);
     private ScheduledExecutorService heartBeat;
     private byte[] paddingBytes = "X".getBytes();
     private boolean resumeOnHeartbeat;
     private int heartbeatFrequencyInSeconds = 60;
-    private AtmosphereConfig config;
     private final AtomicBoolean destroyed = new AtomicBoolean(false);
 
     /**
@@ -323,9 +320,9 @@ public class HeartbeatInterceptor extends AtmosphereInterceptorAdapter {
 
     void cancelF(AtmosphereRequest request) {
         try {
-            Future<?> f = (Future<?>) request.getAttribute(HEARTBEAT_FUTURE);
+            Future<?> f = (Future<?>) request.getAttribute(IdleResourceInterceptor.HEARTBEAT_FUTURE);
             if (f != null) f.cancel(false);
-            request.removeAttribute(HEARTBEAT_FUTURE);
+            request.removeAttribute(IdleResourceInterceptor.HEARTBEAT_FUTURE);
         } catch (Exception ex) {
             // https://github.com/Atmosphere/atmosphere/issues/1503
             logger.trace("", ex);
@@ -350,7 +347,7 @@ public class HeartbeatInterceptor extends AtmosphereInterceptorAdapter {
                                       final AtmosphereResponse response) {
 
         try {
-            request.setAttribute(HEARTBEAT_FUTURE, heartBeat.schedule(new Callable<Object>() {
+            request.setAttribute(IdleResourceInterceptor.HEARTBEAT_FUTURE, heartBeat.schedule(new Callable<Object>() {
                 @Override
                 public Object call() throws Exception {
                     synchronized (r) {

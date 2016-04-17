@@ -40,7 +40,7 @@ import java.lang.reflect.Type;
  */
 abstract class AtmosphereResourceInjector extends BaseInjectableProvider {
 
-    boolean isValidType(Type c) {
+    protected boolean isValidType(Type c) {
         if (c == AtmosphereResource.class) return true;
 
         if (c instanceof ParameterizedType) {

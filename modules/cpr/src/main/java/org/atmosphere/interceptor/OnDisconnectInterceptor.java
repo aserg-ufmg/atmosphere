@@ -40,8 +40,6 @@ public class OnDisconnectInterceptor extends AtmosphereInterceptorAdapter {
 
     private final Logger logger = LoggerFactory.getLogger(OnDisconnectInterceptor.class);
     private AsynchronousProcessor p;
-    private AtmosphereConfig config;
-
     @Override
     public void configure(AtmosphereConfig config) {
         if (AsynchronousProcessor.class.isAssignableFrom(config.framework().getAsyncSupport().getClass())) {

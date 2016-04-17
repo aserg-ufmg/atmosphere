@@ -61,7 +61,7 @@ public class PathParamIntrospector extends InjectIntrospectorAdapter<String> {
                     if (ap.target().getClass().isAnnotationPresent(ManagedService.class)) {
                         String targetPath = ap.target().getClass().getAnnotation(ManagedService.class).path();
                         if (targetPath.indexOf("{") != -1 && targetPath.indexOf("}") != -1) {
-                            paths = new String[] { Utils.pathInfo(r.getRequest()), targetPath };
+                            paths = new String[] { Utils.getPathInfo(r.getRequest()), targetPath };
                         }
                     }
                 }

@@ -15,7 +15,9 @@
  */
 package org.atmosphere.cpr;
 
+import org.atmosphere.container.BlockingIOCometSupport;
 import org.atmosphere.container.Servlet30CometSupport;
+import org.atmosphere.cpr.AtmosphereResourceEventListenerAdapter.OnResume;
 import org.atmosphere.util.EndpointMapper;
 import org.atmosphere.util.ExecutorsFactory;
 import org.atmosphere.util.Utils;
@@ -25,12 +27,15 @@ import org.slf4j.LoggerFactory;
 import javax.servlet.Servlet;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import static org.atmosphere.cpr.Action.TYPE.SKIP_ATMOSPHEREHANDLER;
@@ -126,7 +131,7 @@ public abstract class
      */
     Action action(AtmosphereRequest req, AtmosphereResponse res) throws IOException, ServletException {
 
-        if (!Utils.properProtocol(req)) {
+        if (!AsynchronousProcessor.properProtocol(req)) {
             logger.debug("Invalid request state.");
             res.setStatus(501);
             res.addHeader(X_ATMOSPHERE_ERROR, "Websocket protocol not supported");
@@ -603,5 +608,65 @@ public abstract class
     public boolean supportWebSocket() {
         return false;
     }
+
+	/**
+	 * Suspend the connection by blocking the current {@link Thread}
+	 *
+	 * @param action The {@link Action}
+	 * @param req    the {@link AtmosphereRequest}
+	 * @param res    the {@link AtmosphereResponse}
+	 * @throws java.io.IOException
+	 * @throws javax.servlet.ServletException
+	 */
+	protected void suspend(Action action, AtmosphereRequest req, AtmosphereResponse res) throws IOException, ServletException {
+	
+	    final CountDownLatch latch = new CountDownLatch(1);
+	    req.setAttribute(BlockingIOCometSupport.LATCH, latch);
+	
+	    boolean ok = true;
+	    AtmosphereResource resource = req.resource();
+	    if (resource != null) {
+	        try {
+	            resource.addEventListener(new OnResume() {
+	                @Override
+	                public void onResume(AtmosphereResourceEvent event) {
+	                    latch.countDown();
+	                }
+	            });
+	            if (action.timeout() != -1) {
+	                ok = latch.await(action.timeout(), TimeUnit.MILLISECONDS);
+	            } else {
+	                latch.await();
+	            }
+	        } catch (InterruptedException ex) {
+	            logger.trace("", ex);
+	        } finally {
+	            if (!ok) {
+	                timedout(req, res);
+	            } else {
+	                AtmosphereResourceImpl.class.cast(resource).cancel();
+	            }
+	        }
+	    }
+	}
+
+	public static boolean properProtocol(HttpServletRequest request) {
+	    Enumeration<String> connection = request.getHeaders("Connection");
+	    if (connection == null || !connection.hasMoreElements()) {
+	        connection = request.getHeaders("connection");
+	    }
+	
+	    boolean isOK = false;
+	    boolean isWebSocket = (request.getHeader("sec-websocket-version") != null || request.getHeader("Sec-WebSocket-Draft") != null);
+	    if (connection != null && connection.hasMoreElements()) {
+	        String[] e = connection.nextElement().toString().split(",");
+	        for (String upgrade : e) {
+	            if (upgrade.trim().equalsIgnoreCase("upgrade")) {
+	                isOK = true;
+	            }
+	        }
+	    }
+	    return isWebSocket ? isOK : true;
+	}
 
 }

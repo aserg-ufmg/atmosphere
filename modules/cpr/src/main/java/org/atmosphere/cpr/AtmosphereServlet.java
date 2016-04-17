@@ -85,10 +85,6 @@ public class AtmosphereServlet extends HttpServlet {
         return this;
     }
 
-    protected AtmosphereFramework newAtmosphereFramework() {
-        return initializer.newAtmosphereFramework(AtmosphereFramework.class);
-    }
-
     public AtmosphereFramework framework() {
        return initializer.framework();
     }

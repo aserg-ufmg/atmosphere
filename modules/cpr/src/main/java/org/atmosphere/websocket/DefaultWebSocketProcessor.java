@@ -40,7 +40,7 @@ import org.atmosphere.util.ExecutorsFactory;
 import org.atmosphere.util.Utils;
 import org.atmosphere.util.VoidExecutorService;
 import org.atmosphere.websocket.WebSocketEventListener.WebSocketEvent;
-import org.atmosphere.websocket.protocol.StreamingHttpProtocol;
+import org.atmosphere.websocket.protocol.ProtocolStreamingHttp;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -107,6 +107,7 @@ public class DefaultWebSocketProcessor implements WebSocketProcessor, Serializab
     private /* final */ long closingTime;
     private AsynchronousProcessor asynchronousProcessor;
     private /* final */ boolean invokeInterceptors;
+	public final static VoidExecutorService VOID = new VoidExecutorService();
 
     public DefaultWebSocketProcessor() {
     }
@@ -138,7 +139,7 @@ public class DefaultWebSocketProcessor implements WebSocketProcessor, Serializab
         if (executeAsync) {
             asyncExecutor = ExecutorsFactory.getAsyncOperationExecutor(config, "WebSocket");
         } else {
-            asyncExecutor = VoidExecutorService.VOID;
+            asyncExecutor = DefaultWebSocketProcessor.VOID;
         }
 
         scheduler = ExecutorsFactory.getScheduler(config);
@@ -204,7 +205,7 @@ public class DefaultWebSocketProcessor implements WebSocketProcessor, Serializab
             request.setAttribute(INJECTED_ATMOSPHERE_RESOURCE, r);
             request.setAttribute(SUSPENDED_ATMOSPHERE_RESOURCE_UUID, r.uuid());
 
-            if (Utils.firefoxWebSocketEnabled(request)) {
+            if (DefaultWebSocketProcessor.firefoxWebSocketEnabled(request)) {
                 request.setAttribute("firefox", "true");
             }
 
@@ -837,7 +838,7 @@ public class DefaultWebSocketProcessor implements WebSocketProcessor, Serializab
         int maxSize = byteBufferMaxSize;
         ByteBuffer bb = webSocket.bb;
         if (bb.limit() >= maxSize) {
-            throw new IOException("Message Buffer too small. Use " + StreamingHttpProtocol.class.getName() + " when streaming over websocket.");
+            throw new IOException("Message Buffer too small. Use " + ProtocolStreamingHttp.class.getName() + " when streaming over websocket.");
         }
 
         long newSize = bb.limit() * 2;
@@ -857,7 +858,7 @@ public class DefaultWebSocketProcessor implements WebSocketProcessor, Serializab
         int maxSize = charBufferMaxSize;
         CharBuffer cb = webSocket.cb;
         if (cb.limit() >= maxSize) {
-            throw new IOException("Message Buffer too small. Use " + StreamingHttpProtocol.class.getName() + " when streaming over websocket.");
+            throw new IOException("Message Buffer too small. Use " + ProtocolStreamingHttp.class.getName() + " when streaming over websocket.");
         }
 
         long newSize = cb.limit() * 2;
@@ -951,4 +952,12 @@ public class DefaultWebSocketProcessor implements WebSocketProcessor, Serializab
             WebSocketPingPongListener.class.cast(webSocketHandler.proxied()).onPing(webSocket, payload, offset, length);
         }
     }
+
+	public final static boolean firefoxWebSocketEnabled(HttpServletRequest request) {
+	    return Utils.webSocketEnabled(request)
+	            && request.getHeader(HeaderConfig.X_ATMO_PROTOCOL) != null
+	            && request.getHeader(HeaderConfig.X_ATMO_PROTOCOL).equals("true")
+	            && request.getHeader("User-Agent") != null
+	            && request.getHeader("User-Agent").toLowerCase().indexOf("firefox") != -1;
+	}
 }

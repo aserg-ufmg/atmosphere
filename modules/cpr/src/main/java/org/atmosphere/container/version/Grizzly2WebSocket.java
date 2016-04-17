@@ -24,6 +24,7 @@ import java.util.Arrays;
 public class Grizzly2WebSocket extends WebSocket {
 
     private final org.glassfish.grizzly.websockets.WebSocket webSocket;
+	private Object attachment;
 
     public Grizzly2WebSocket(org.glassfish.grizzly.websockets.WebSocket webSocket, AtmosphereConfig config) {
         super(config);
@@ -52,4 +53,21 @@ public class Grizzly2WebSocket extends WebSocket {
         logger.trace("WebSocket.close() for AtmosphereResource {}", resource() != null ? resource().uuid() : "null");
         webSocket.close();
     }
+
+	/**
+	 * Attach an object. Be careful when attaching an object as it can cause memory leak
+	 *
+	 * @oaram object
+	 */
+	public WebSocket attachment(Object attachment) {
+	    this.attachment = attachment;
+	    return this;
+	}
+
+	/**
+	 * Return the attachment
+	 */
+	public Object attachment() {
+	    return attachment;
+	}
 }

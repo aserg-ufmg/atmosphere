@@ -51,7 +51,6 @@ public class TrackMessageSizeB64Interceptor extends AtmosphereInterceptorAdapter
 
     private static final Logger logger = LoggerFactory.getLogger(TrackMessageSizeB64Interceptor.class);
     private static final String DELIMITER = "|";
-    private final static String OUT_ENCODING = "UTF-8";
     public final static String SKIP_INTERCEPTOR = TrackMessageSizeB64Interceptor.class.getName() + ".skip";
 
     private final HashSet<String> excludedContentTypes = new HashSet<String>();

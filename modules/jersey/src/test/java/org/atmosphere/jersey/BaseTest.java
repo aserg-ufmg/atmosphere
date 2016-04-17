@@ -48,14 +48,6 @@ public abstract class BaseTest {
         server.start();
     }
 
-    public void configureCometSupport() {
-        atmoServlet.framework().setAsyncSupport(new Jetty7CometSupport(atmoServlet.framework().getAtmosphereConfig()));
-    }
-
-    public void stopServer() throws Exception {
-        server.stop();
-    }
-
     public static class TestHelper {
 
         public static int getEnvVariable(final String varName, int defaultValue) {
@@ -95,17 +87,19 @@ public abstract class BaseTest {
         atmoServlet = new AtmosphereServlet();
         atmoServlet.framework().addInitParameter("com.sun.jersey.config.property.packages", this.getClass().getPackage().getName());
 
-        configureCometSupport();
+        atmoServlet.framework().setAsyncSupport(new Jetty7CometSupport(atmoServlet.framework().getAtmosphereConfig()));
         startServer();
     }
-
-    abstract String getUrlTarget(int port);
 
     @AfterMethod(alwaysRun = true)
     public void unsetAtmosphereHandler() throws Exception {
         if (atmoServlet != null) atmoServlet.destroy();
-        stopServer();
+        server.stop();
     }
+
+	protected String getUrlTarget(int port) {
+	    return "http://127.0.0.1:" + port + "/jfarcand@apache.org";
+	}
 
 
 }

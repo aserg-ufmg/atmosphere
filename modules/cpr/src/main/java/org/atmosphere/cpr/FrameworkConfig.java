@@ -107,11 +107,11 @@ public interface FrameworkConfig {
      */
     String WEBSOCKET_SUBPROTOCOL = "websocket-subprotocol";
     /**
-     * The SimpleHttpProtocol.
+     * The ProtocolSimpleHttp.
      */
     String SIMPLE_HTTP_OVER_WEBSOCKET = "polling-websocket-message";
     /**
-     * The {@link org.atmosphere.websocket.protocol.StreamingHttpProtocol}.
+     * The {@link org.atmosphere.websocket.protocol.ProtocolStreamingHttp}.
      */
     String STREAMING_HTTP_OVER_WEBSOCKET = "streaming-websocket-message";
     /**

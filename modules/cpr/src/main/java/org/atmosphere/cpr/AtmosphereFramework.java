@@ -47,7 +47,6 @@ import org.atmosphere.util.DefaultUUIDProvider;
 import org.atmosphere.util.EndpointMapper;
 import org.atmosphere.util.ExecutorsFactory;
 import org.atmosphere.util.IOUtils;
-import org.atmosphere.util.IntrospectionUtils;
 import org.atmosphere.util.ServletContextFactory;
 import org.atmosphere.util.UUIDProvider;
 import org.atmosphere.util.Utils;
@@ -56,6 +55,7 @@ import org.atmosphere.util.VoidServletConfig;
 import org.atmosphere.util.analytics.FocusPoint;
 import org.atmosphere.util.analytics.JGoogleAnalyticsTracker;
 import org.atmosphere.util.analytics.ModuleDetection;
+import org.atmosphere.util.tools.IntrospectionUtils;
 import org.atmosphere.websocket.DefaultWebSocketFactory;
 import org.atmosphere.websocket.DefaultWebSocketProcessor;
 import org.atmosphere.websocket.WebSocket;
@@ -63,7 +63,7 @@ import org.atmosphere.websocket.WebSocketFactory;
 import org.atmosphere.websocket.WebSocketHandler;
 import org.atmosphere.websocket.WebSocketProcessor;
 import org.atmosphere.websocket.WebSocketProtocol;
-import org.atmosphere.websocket.protocol.SimpleHttpProtocol;
+import org.atmosphere.websocket.protocol.ProtocolSimpleHttp;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -203,7 +203,7 @@ public class AtmosphereFramework {
     protected String broadcasterCacheClassName;
     protected boolean webSocketEnabled = true;
     protected String broadcasterLifeCyclePolicy = "NEVER";
-    protected String webSocketProtocolClassName = SimpleHttpProtocol.class.getName();
+    protected String webSocketProtocolClassName = ProtocolSimpleHttp.class.getName();
     protected WebSocketProtocol webSocketProtocol;
     protected String handlersPath = DEFAULT_HANDLER_PATH;
     protected ServletConfig servletConfig;
@@ -269,6 +269,7 @@ public class AtmosphereFramework {
     };
     private WebSocketFactory webSocketFactory;
     private IllegalStateException initializationError;
+	public static final int POLLING_DEFAULT = 100;
 
     /**
      * An implementation of {@link AbstractReflectorAtmosphereHandler}.
@@ -1052,7 +1053,7 @@ public class AtmosphereFramework {
 
         logger.info("Default Broadcaster Class: {}", broadcasterClassName);
         logger.info("Broadcaster Shared List Resources: {}", config.getInitParameter(BROADCASTER_SHAREABLE_LISTENERS, false));
-        logger.info("Broadcaster Polling Wait Time {}", s == null ? DefaultBroadcaster.POLLING_DEFAULT : s);
+        logger.info("Broadcaster Polling Wait Time {}", s == null ? AtmosphereFramework.POLLING_DEFAULT : s);
         logger.info("Shared ExecutorService supported: {}", sharedThreadPools);
 
         ExecutorService executorService = ExecutorsFactory.getMessageDispatcher(config, Broadcaster.ROOT_MASTER);
@@ -1736,7 +1737,7 @@ public class AtmosphereFramework {
     }
 
     public void checkWebSocketSupportState(){
-        if (atmosphereHandlers.isEmpty() && !SimpleHttpProtocol.class.isAssignableFrom(webSocketProtocol.getClass())) {
+        if (atmosphereHandlers.isEmpty() && !ProtocolSimpleHttp.class.isAssignableFrom(webSocketProtocol.getClass())) {
             logger.debug("Adding a void AtmosphereHandler mapped to /* to allow WebSocket application only");
             addAtmosphereHandler(Broadcaster.ROOT_MASTER, new AbstractReflectorAtmosphereHandler() {
                 @Override
@@ -1765,7 +1766,7 @@ public class AtmosphereFramework {
             } catch (Exception ex) {
                 logger.error("Cannot load the WebSocketProtocol {}", getWebSocketProtocolClassName(), ex);
                 try {
-                    webSocketProtocol = newClassInstance(WebSocketProtocol.class, SimpleHttpProtocol.class);
+                    webSocketProtocol = newClassInstance(WebSocketProtocol.class, ProtocolSimpleHttp.class);
                 } catch (Exception e) {
                 }
             }

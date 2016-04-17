@@ -31,7 +31,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import static org.mockito.Mockito.mock;
 import static org.testng.Assert.assertEquals;
 
-public class ExcludeSessionBroadcasterTest {
+public class SessionExcludeBroadcasterTest {
 
     private AtmosphereResource ar;
     private Broadcaster broadcaster;

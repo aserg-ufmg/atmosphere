@@ -46,6 +46,7 @@ public class JSR356WebSocket extends WebSocket {
     private final Semaphore semaphore = new Semaphore(1, true);// https://issues.apache.org/bugzilla/show_bug.cgi?id=56026
     private final int writeTimeout;
     private final AtomicBoolean closed = new AtomicBoolean();
+	private Object attachment;
 
     public JSR356WebSocket(Session session, AtmosphereConfig config) {
         super(config);
@@ -146,7 +147,24 @@ public class JSR356WebSocket extends WebSocket {
         }
     }
 
-    private final class WriteResult implements SendHandler {
+    /**
+	 * Attach an object. Be careful when attaching an object as it can cause memory leak
+	 *
+	 * @oaram object
+	 */
+	public WebSocket attachment(Object attachment) {
+	    this.attachment = attachment;
+	    return this;
+	}
+
+	/**
+	 * Return the attachment
+	 */
+	public Object attachment() {
+	    return attachment;
+	}
+
+	private final class WriteResult implements SendHandler {
 
         private final AtmosphereResource r;
         private final Object message;

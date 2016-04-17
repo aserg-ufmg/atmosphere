@@ -44,8 +44,8 @@ public class IdleResourceInterceptor extends AtmosphereInterceptorAdapter {
 
     private final Logger logger = LoggerFactory.getLogger(IdleResourceInterceptor.class);
     private long maxInactiveTime = -1;
-    private AtmosphereConfig config;
     private Future<?> future;
+	public final static String HEARTBEAT_FUTURE = "heartbeat.future";
 
     public void configure(AtmosphereConfig config) {
         this.config = config;
@@ -104,9 +104,9 @@ public class IdleResourceInterceptor extends AtmosphereInterceptorAdapter {
                         req.setAttribute(MAX_INACTIVE, (long) -1);
 
                         logger.debug("IdleResourceInterceptor disconnecting {}", r);
-                        Future<?> f = (Future<?>) req.getAttribute(HeartbeatInterceptor.HEARTBEAT_FUTURE);
+                        Future<?> f = (Future<?>) req.getAttribute(IdleResourceInterceptor.HEARTBEAT_FUTURE);
                         if (f != null) f.cancel(false);
-                        req.removeAttribute(HeartbeatInterceptor.HEARTBEAT_FUTURE);
+                        req.removeAttribute(IdleResourceInterceptor.HEARTBEAT_FUTURE);
 
                         WebSocket webSocket = AtmosphereResourceImpl.class.cast(r).webSocket();
                         if (webSocket != null) {
@@ -129,7 +129,7 @@ public class IdleResourceInterceptor extends AtmosphereInterceptorAdapter {
         return maxInactiveTime;
     }
 
-    public IdleResourceInterceptor maxInactiveTime(long maxInactiveTime) {
+    public AtmosphereInterceptorAdapter maxInactiveTime(long maxInactiveTime) {
         this.maxInactiveTime = maxInactiveTime;
         start();
         return this;

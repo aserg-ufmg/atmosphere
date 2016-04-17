@@ -88,7 +88,7 @@ public class Servlet30CometSupport extends AsynchronousProcessor {
      * @throws java.io.IOException
      * @throws javax.servlet.ServletException
      */
-    private void suspend(Action action, AtmosphereRequest req, AtmosphereResponse res)
+    protected void suspend(Action action, AtmosphereRequest req, AtmosphereResponse res)
             throws IOException, ServletException {
 
         if (!req.isAsyncStarted() && !Utils.webSocketEnabled(req)) {
